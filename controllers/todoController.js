@@ -2,7 +2,7 @@ const body_parser = require('body-parser');
 
 const url_encoded_parser = body_parser.urlencoded({extended: false});
 
-const data = [
+let data = [
     {item: 'get milk'},
     {item: 'walk dog'},
     {item: 'code code code'},
@@ -19,8 +19,9 @@ module.exports = (app) => {
         res.json(data);        
     });
 
-    app.delete('/todo', (req, res) => {
-        
+    app.delete('/todo/:item', (req, res) => {
+        data = data.filter( todo => (todo.item.replace(/ /g, '-') !== req.params.item));
+        res.json(data);
     });
 
 };
