@@ -1,27 +1,45 @@
 const body_parser = require('body-parser');
+const mongoose = require('mongoose');
 
 const url_encoded_parser = body_parser.urlencoded({extended: false});
 
-let data = [
-    {item: 'get milk'},
-    {item: 'walk dog'},
-    {item: 'code code code'},
-];
+// Connect to DB
+const password = process.env.DB_PASS;
+const uri = `mongodb+srv://zizo:${password}@todos.fggrd.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
+
+mongoose.connect(uri);
+
+// Create schema
+const todoSchema = new mongoose.Schema({
+    item: String
+});
+// Create Model
+const Todo = mongoose.model('Todo', todoSchema);
 
 module.exports = (app) => {
 
     app.get('/todo', (req, res) => {
-        res.render('todo', {todos: data})
+        Todo.find({}, (err, data) => {
+            if (err) throw err;
+            res.render('todo', {todos: data})
+        })
+        
     });
 
     app.post('/todo', url_encoded_parser, (req, res) => {
-        data.push(req.body);
-        res.json(data);        
+        console.log(req.body.item);
+        new Todo({item: req.body.item}).save((err, data) =>{
+            if (err) throw err;
+            res.json(data);        
+        });
     });
 
     app.delete('/todo/:item', (req, res) => {
-        data = data.filter( todo => (todo.item.replace(/ /g, '-') !== req.params.item));
-        res.json(data);
+
+        if (err) throw err;
+        Todo.find({item: req.params.item.replace(/\-/g, ' ') }).deleteOne((err,data) => {
+            res.json(data);
+        })
     });
 
 };
