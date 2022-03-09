@@ -7,7 +7,7 @@ const app = express();
 app.set('view engine', 'ejs');
 
 // static files
-app.use('/assests', express.static('./public'));
+app.use(express.static('./public'));
 
 // fire controllers
 
